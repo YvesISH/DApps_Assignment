@@ -14,7 +14,9 @@ Balance Check: Users can check the token balance of any Ethereum address.
 ### Prerequisites
 
 Node.js: Make sure you have Node.js installed (https://nodejs.org/).
+
 Truffle Suite: Truffle is required to compile, deploy, and test the smart contract (https://trufflesuite.com/).
+
 MetaMask: For interacting with the DApp, you'll need the MetaMask browser extension (https://metamask.io/).
 
 ### Technologies Used
