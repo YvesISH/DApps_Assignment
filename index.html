@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Transfer DApp</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #4338ca;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --error-color: #ef4444;
+            --success-color: #22c55e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-color);
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .connect-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .button i {
+            margin-right: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .status.success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        .status.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        #accountDisplay {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            word-break: break-all;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ERC-20 Token Transfer DApp</h1>
+        
+        <div class="connect-section">
+            <button class="button" onclick="connectWallet()">
+                <i class="fas fa-wallet"></i>Connect Wallet
+            </button>
+            <div id="accountDisplay"></div>
+        </div>
+
+        <div class="card">
+            <h2>Check Balance</h2>
+            <div class="input-group">
+                <input type="text" 
+                       id="balanceOfAddress" 
+                       class="input" 
+                       placeholder="Enter Address" />
+                <button class="button" onclick="checkBalance()">
+                    <i class="fas fa-search"></i>Check Balance
+                </button>
+            </div>
+            <p id="balanceResult" class="status"></p>
+        </div>
+
+        <div class="card">
+            <h2>Transfer Tokens</h2>
+            <div class="input-group">
+                <input type="text" 
+                       id="recipientAddress" 
+                       class="input" 
+                       placeholder="Recipient Address" />
+                <input type="number" 
+                       id="transferAmount" 
+                       class="input" 
+                       placeholder="Amount" />
+                <button class="button" onclick="transferTokens()">
+                    <i class="fas fa-paper-plane"></i>Transfer
+                </button>
+            </div>
+            <p id="transferStatus" class="status"></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script>
+        let web3;
+        let contract;
+        const contractAddress = "0x8E05D4fFFCe1020220d6648336AdCf66F60B1F01";
+
+        async function connectWallet() {
+            try {
+                if (window.ethereum) {
+                    await window.ethereum.request({ method: "eth_requestAccounts" });
+                    web3 = new Web3(window.ethereum);
+                    const accounts = await web3.eth.getAccounts();
+                    document.getElementById("accountDisplay").innerHTML =
+                        `<i class="fas fa-user"></i> Connected Account: ${accounts[0]}`;
+
+                    // Load ABI from external file and initialize the contract
+                    const response = await fetch("./ABI.json");
+                    const abi = await response.json();
+                    contract = new web3.eth.Contract(abi, contractAddress);
+                } else {
+                    throw new Error("Please install MetaMask.");
+                }
+            } catch (error) {
+                showError("Connection failed: " + error.message);
+            }
+        }
+
+        async function checkBalance() {
+            try {
+                const address = document.getElementById("balanceOfAddress").value;
+                if (!web3.utils.isAddress(address)) {
+                    throw new Error("Invalid address format");
+                }
+                const balance = await contract.methods.balanceOf(address).call();
+                document.getElementById("balanceResult").innerHTML = 
+                    `<i class="fas fa-coins"></i> Balance: ${balance}`;
+                document.getElementById("balanceResult").className = "status success";
+            } catch (error) {
+                showError("Balance check failed: " + error.message);
+            }
+        }
+
+        async function transferTokens() {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const recipient = document.getElementById("recipientAddress").value;
+                const amount = document.getElementById("transferAmount").value;
+                
+                if (!web3.utils.isAddress(recipient)) {
+                    throw new Error("Invalid recipient address");
+                }
+                if (amount <= 0) {
+                    throw new Error("Amount must be greater than 0");
+                }
+
+                const status = document.getElementById("transferStatus");
+                status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing transfer...';
+                status.className = "status";
+
+                await contract.methods
+                    .transfer(recipient, amount)
+                    .send({ from: accounts[0] });
+                
+                status.innerHTML = '<i class="fas fa-check-circle"></i> Transfer successful!';
+                status.className = "status success";
+            } catch (error) {
+                showError("Transfer failed: " + error.message);
+            }
+        }
+
+        function showError(message) {
+            const status = document.getElementById("transferStatus");
+            status.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            status.className = "status error";
+        }
+    </script>
+</body>
+</html>
