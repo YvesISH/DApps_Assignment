@@ -2,6 +2,26 @@
 
 This project is a simple ERC-20 token smart contract, deployed on the Ethereum blockchain, along with a frontend decentralized application (DApp) that allows users to interact with the token contract. The DApp enables users to check balances, transfer tokens, and connect their wallets to the Ethereum network.
 
+
+## Screenshots and Visuals
+./assets
+
+### Deployment on MetaMask
+
+This image shows the contract being deployed on MetaMask, indicating the successful interaction between the smart contract and the Ethereum blockchain.
+
+### MetaMask Successful Deployment
+This screenshot captures the MetaMask confirmation screen after the contract deployment, confirming that the deployment was successful.
+
+### Landing Page
+This is a view of the DApp's landing page, providing the user interface for interacting with the ERC-20 token contract.
+
+### Connecting to the Contract
+This image shows the UI when connecting to the Ethereum contract via MetaMask, allowing the user to interact with the deployed token contract.
+
+### Successful Token Transfer
+This screenshot highlights the successful transfer of tokens between users, confirming the transaction via the DApp's user interface.
+
 ### Features
 ERC-20 Token Standard Compliance: The smart contract follows the ERC-20 standard, implementing functions such as transfer, balanceOf, and totalSupply.
 
