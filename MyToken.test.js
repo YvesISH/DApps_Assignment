@@ -9,7 +9,7 @@ contract("MyToken", (accounts) => {
     assert.equal(
       balanceAfter - balanceBefore,
       1000,
-      "Tokens weren't transferred correctly"
+      "Sorry, your tokens were not successfully transferred!!"
     );
   });
 });
