@@ -20,6 +20,9 @@ MetaMask: For interacting with the DApp, you'll need the MetaMask browser extens
 ### Technologies Used
 
 Solidity: For writing the ERC-20 smart contract.
+
 Truffle: Development environment for smart contracts.
+
 JavaScript: For the frontend of the DApp.
+
 MetaMask: Wallet integration for Ethereum interaction.
